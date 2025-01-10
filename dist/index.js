@@ -28,8 +28,16 @@ export const typeDefs = `#graphql
     authors: [Author]
     author(id: ID!): Author
   }
+  type Mutation {
+    addGame(game: AddGameInput!): Game
+    deleteGame(id: ID!): [Game]
+  }
+  input AddGameInput{
+    title: String!
+    platform: [String!]!
+  }
 `;
-const games = [
+let games = [
     { id: "1", title: "Zelda, Tears of the Kingdom", platform: ["Switch"] },
     { id: "2", title: "Final Fantasy 7 Remake", platform: ["PS5", "Xbox"] },
     { id: "3", title: "Elden Ring", platform: ["PS5", "Xbox", "PC"] },
@@ -88,6 +96,20 @@ const resolvers = {
     Author: {
         reviews(parent) {
             return reviews.filter((r) => r.author_id === parent.id);
+        },
+    },
+    Mutation: {
+        deleteGame(_, args) {
+            games = games.filter((g) => g.id !== args.id);
+            return games;
+        },
+        addGame(_, args) {
+            let game = {
+                ...args.game,
+                id: Math.floor(Math.random() * 10000).toString(),
+            };
+            games.push(game);
+            return game;
         },
     },
 };
