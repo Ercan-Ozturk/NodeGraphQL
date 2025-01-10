@@ -20,6 +20,7 @@ const typeDefs = `#graphql
         reviews: [Review]
         review(id: ID!): Review
         games: [Game]
+        game(id: ID!): Game
         authors: [Author]
     }
 `;
@@ -49,6 +50,9 @@ const resolvers = {
     Query: {
         games() {
             return games;
+        },
+        game(_, args, context) {
+            return games.find((game) => game.id === args.id);
         },
         authors() {
             return authors;
