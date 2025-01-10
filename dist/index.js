@@ -1,39 +1,60 @@
 import { ApolloServer } from "@apollo/server";
 import { startStandaloneServer } from "@apollo/server/standalone";
-// A schema is a collection of type definitions (hence "typeDefs")
-// that together define the "shape" of queries that are executed against
-// your data.
 const typeDefs = `#graphql
-  # Comments in GraphQL strings (such as this one) start with the hash (#) symbol.
-
-  # This "Book" type defines the queryable fields for every book in our data source.
-  type Book {
-    title: String
-    author: String
-  }
-
-  # The "Query" type is special: it lists all of the available queries that
-  # clients can execute, along with the return type for each. In this
-  # case, the "books" query returns an array of zero or more Books (defined above).
-  type Query {
-    books: [Book]
-  }
+    type Game {
+        id: ID!
+        title: String!
+        platform: [String!]!
+    }
+    type Review {
+        id: ID!
+        rating: Int!
+        content: String!
+    }
+    type Author {
+        id: ID!
+        name: String!
+        verified: Boolean!
+    }
+    type Query {
+        reviews: [Review]
+        games: [Game]
+        authors: [Author]
+    }
 `;
-const books = [
-    {
-        title: "The Awakening",
-        author: "Kate Chopin",
-    },
-    {
-        title: "City of Glass",
-        author: "Paul Auster",
-    },
+const games = [
+    { id: "1", title: "Zelda, Tears of the Kingdom", platform: ["Switch"] },
+    { id: "2", title: "Final Fantasy 7 Remake", platform: ["PS5", "Xbox"] },
+    { id: "3", title: "Elden Ring", platform: ["PS5", "Xbox", "PC"] },
+    { id: "4", title: "Mario Kart", platform: ["Switch"] },
+    { id: "5", title: "Pokemon Scarlet", platform: ["PS5", "Xbox", "PC"] },
 ];
-// Resolvers define how to fetch the types defined in your schema.
-// This resolver retrieves books from the "books" array above.
+const authors = [
+    { id: "1", name: "mario", verified: true },
+    { id: "2", name: "yoshi", verified: false },
+    { id: "3", name: "peach", verified: true },
+];
+const reviews = [
+    { id: "1", rating: 9, content: "lorem ipsum", author_id: "1", game_id: "2" },
+    { id: "2", rating: 10, content: "lorem ipsum", author_id: "2", game_id: "1" },
+    { id: "3", rating: 7, content: "lorem ipsum", author_id: "3", game_id: "3" },
+    { id: "4", rating: 5, content: "lorem ipsum", author_id: "2", game_id: "4" },
+    { id: "5", rating: 8, content: "lorem ipsum", author_id: "2", game_id: "5" },
+    { id: "6", rating: 7, content: "lorem ipsum", author_id: "1", game_id: "2" },
+    { id: "7", rating: 10, content: "lorem ipsum", author_id: "3", game_id: "1" },
+];
+// resolvers
 const resolvers = {
     Query: {
-        books: () => books,
+        games() {
+            return games;
+        },
+        authors() {
+            return authors;
+        },
+        reviews() {
+            return reviews;
+        },
     },
 };
 // The ApolloServer constructor requires two parameters: your schema
