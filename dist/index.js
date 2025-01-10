@@ -31,10 +31,15 @@ export const typeDefs = `#graphql
   type Mutation {
     addGame(game: AddGameInput!): Game
     deleteGame(id: ID!): [Game]
+    updateGame(id: ID!, edits: UpdateGameInput!): Game
   }
   input AddGameInput{
     title: String!
     platform: [String!]!
+  }
+    input UpdateGameInput{
+    title: String
+    platform: [String!]
   }
 `;
 let games = [
@@ -110,6 +115,15 @@ const resolvers = {
             };
             games.push(game);
             return game;
+        },
+        updateGame(_, args) {
+            games = games.map((g) => {
+                if (g.id === args.id) {
+                    return { ...g, ...args.edits };
+                }
+                return g;
+            });
+            return games.find((g) => g.id === args.id);
         },
     },
 };
