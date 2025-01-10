@@ -1,29 +1,34 @@
 import { ApolloServer } from "@apollo/server";
 import { startStandaloneServer } from "@apollo/server/standalone";
 
-const typeDefs = `#graphql
-    type Game {
-        id: ID!
-        title: String!
-        platform: [String!]!
-    }
-    type Review {
-        id: ID!
-        rating: Int!
-        content: String!
-    }
-    type Author {
-        id: ID!
-        name: String!
-        verified: Boolean!
-    }
-    type Query {
-        reviews: [Review]
-        review(id: ID!): Review
-        games: [Game]
-        game(id: ID!): Game
-        authors: [Author]
-    }
+export const typeDefs = `#graphql
+  type Game {
+    id: ID!
+    title: String!
+    platform: [String!]!
+    reviews: [Review!]
+  }
+  type Review {
+    id: ID!
+    rating: Int!
+    content: String!
+    author: Author!
+    game: Game!
+  }
+  type Author {
+    id: ID!
+    name: String!
+    verified: Boolean!
+    reviews: [Review!]
+  }
+  type Query {
+    games: [Game]
+    game(id: ID!): Game
+    reviews: [Review]
+    review(id: ID!): Review
+    authors: [Author]
+    author(id: ID!): Author
+  }
 `;
 const games = [
   { id: "1", title: "Zelda, Tears of the Kingdom", platform: ["Switch"] },
@@ -55,17 +60,38 @@ const resolvers = {
     games() {
       return games;
     },
-    game(_, args, context) {
+    game(_, args) {
       return games.find((game) => game.id === args.id);
     },
     authors() {
       return authors;
     },
+    author(_, args) {
+      return authors.find((author) => author.id === args.id);
+    },
     reviews() {
       return reviews;
     },
-    review(_, args, context) {
+    review(_, args) {
       return reviews.find((review) => review.id === args.id);
+    },
+  },
+  Game: {
+    reviews(parent) {
+      return reviews.filter((r) => r.game_id === parent.id);
+    },
+  },
+  Review: {
+    author(parent) {
+      return authors.find((a) => a.id === parent.author_id);
+    },
+    game(parent) {
+      return games.find((g) => g.id === parent.game_id);
+    },
+  },
+  Author: {
+    reviews(parent) {
+      return reviews.filter((r) => r.author_id === parent.id);
     },
   },
 };
