@@ -18,6 +18,7 @@ const typeDefs = `#graphql
     }
     type Query {
         reviews: [Review]
+        review(id: ID!): Review
         games: [Game]
         authors: [Author]
     }
@@ -55,6 +56,9 @@ const resolvers = {
         reviews() {
             return reviews;
         },
+        review(_, args, context) {
+            return reviews.find((review) => review.id === args.id);
+        },
     },
 };
 // The ApolloServer constructor requires two parameters: your schema
@@ -62,6 +66,7 @@ const resolvers = {
 const server = new ApolloServer({
     typeDefs,
     resolvers,
+    csrfPrevention: false,
 });
 // Passing an ApolloServer instance to the `startStandaloneServer` function:
 //  1. creates an Express app
